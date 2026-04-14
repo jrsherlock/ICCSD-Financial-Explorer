@@ -22,9 +22,12 @@ import {
   formatNumber,
   formatCurrencyExact,
 } from '../lib/formatters';
-import { CHART_COLORS } from '../lib/colors';
+import { CHART_COLORS, AXIS_TICK_COLOR, GRID_STROKE_COLOR } from '../lib/colors';
+import { useTheme } from '../lib/theme';
 
 export function Timeline() {
+  const { theme } = useTheme();
+
   // Monthly CC spend — debits only (exclude credits/payments which distort the chart)
   const monthlyData = useMemo(() => {
     const map = new Map<
@@ -104,7 +107,7 @@ export function Timeline() {
       <div className="mb-10">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-1 h-5 rounded-full bg-purple-500" />
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-purple-400">
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-purple-600 dark:text-purple-400">
             Credit Card Trends
           </h3>
         </div>
@@ -143,22 +146,22 @@ export function Timeline() {
             >
               <defs>
                 <linearGradient id="ccGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#a855f7" stopOpacity={0.3} />
+                  <stop offset="5%" stopColor="#a855f7" stopOpacity={theme === 'dark' ? 0.3 : 0.12} />
                   <stop offset="95%" stopColor="#a855f7" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#2a2a3e" />
+              <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE_COLOR} />
               <XAxis
                 dataKey="month"
                 tickFormatter={formatMonth}
-                tick={{ fill: '#a0a0b4', fontSize: 10 }}
+                tick={{ fill: AXIS_TICK_COLOR, fontSize: 10 }}
                 axisLine={false}
                 tickLine={false}
                 interval={2}
               />
               <YAxis
                 tickFormatter={formatCompactCurrency}
-                tick={{ fill: '#a0a0b4', fontSize: 11 }}
+                tick={{ fill: AXIS_TICK_COLOR, fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
               />
@@ -171,11 +174,11 @@ export function Timeline() {
                       <p className="font-medium">
                         {formatMonth(label as string)}
                       </p>
-                      <p className="text-purple-400">
+                      <p className="text-purple-600 dark:text-purple-400">
                         {formatCurrency(d.spend)} purchases
                       </p>
                       {d.credits > 0 && (
-                        <p className="text-green-400">
+                        <p className="text-green-600 dark:text-green-400">
                           -{formatCurrency(d.credits)} credits
                         </p>
                       )}
@@ -207,17 +210,17 @@ export function Timeline() {
               data={monthlyVolume}
               margin={{ top: 5, right: 20, bottom: 5, left: 10 }}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="#2a2a3e" />
+              <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE_COLOR} />
               <XAxis
                 dataKey="month"
                 tickFormatter={formatMonth}
-                tick={{ fill: '#a0a0b4', fontSize: 10 }}
+                tick={{ fill: AXIS_TICK_COLOR, fontSize: 10 }}
                 axisLine={false}
                 tickLine={false}
                 interval={2}
               />
               <YAxis
-                tick={{ fill: '#a0a0b4', fontSize: 11 }}
+                tick={{ fill: AXIS_TICK_COLOR, fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
               />
@@ -229,7 +232,7 @@ export function Timeline() {
                       <p className="font-medium">
                         {formatMonth(label as string)}
                       </p>
-                      <p className="text-purple-400">
+                      <p className="text-purple-600 dark:text-purple-400">
                         {formatNumber(payload[0].value as number)} transactions
                       </p>
                     </div>
@@ -268,7 +271,7 @@ export function Timeline() {
                     {formatDate(t.tranDate)} ·{' '}
                     <Link
                       to={`/credit-cards?cards=${t.card}`}
-                      className="text-purple-400/70 hover:text-purple-300 hover:underline transition-colors"
+                      className="text-purple-600/70 dark:text-purple-400/70 hover:text-purple-500 dark:hover:text-purple-300 hover:underline transition-colors"
                     >
                       Card {t.card}
                     </Link>
@@ -276,7 +279,7 @@ export function Timeline() {
                 </div>
                 <span
                   className={`font-mono text-sm shrink-0 ${
-                    t.amount < 0 ? 'text-green-400' : ''
+                    t.amount < 0 ? 'text-green-600 dark:text-green-400' : ''
                   }`}
                 >
                   {formatCurrencyExact(t.amount)}
@@ -291,7 +294,7 @@ export function Timeline() {
       <div>
         <div className="flex items-center gap-3 mb-4">
           <div className="w-1 h-5 rounded-full bg-blue-500" />
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-blue-400">
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
             Accounts Payable Timeline
           </h3>
         </div>

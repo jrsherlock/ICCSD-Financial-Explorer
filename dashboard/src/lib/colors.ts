@@ -32,6 +32,11 @@ export const CHART_COLORS = [
 export const AP_COLOR = '#3b82f6';   // blue-500 — Accounts Payable
 export const CC_COLOR = '#a855f7';   // purple-500 — Credit Cards
 
+// Recharts theme colors — CSS variable references so they adapt to light/dark mode.
+// SVG presentation attributes support var() in modern browsers.
+export const AXIS_TICK_COLOR = 'var(--color-muted-foreground)';
+export const GRID_STROKE_COLOR = 'var(--color-border)';
+
 export function getFundColor(code: string): string {
   return FUND_COLORS[code] || '#64748b';
 }
