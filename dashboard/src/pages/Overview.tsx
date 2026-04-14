@@ -9,12 +9,7 @@ import {
   Cell,
 } from 'recharts';
 import { KpiCard } from '../components/ui/KpiCard';
-import {
-  fundSummary,
-  apLineItems,
-  bmoTransactions,
-  lookups,
-} from '../lib/data-loader';
+import { useData } from '../lib/data-loader';
 import {
   aggregateVendors,
   aggregateByFund,
@@ -45,6 +40,7 @@ const CustomTooltip = ({
 
 export function Overview() {
   const navigate = useNavigate();
+  const { fundSummary, apLineItems, bmoTransactions, lookups } = useData();
   const vendors = aggregateVendors(apLineItems);
   const fundData = aggregateByFund(apLineItems);
   const topBmoSuppliers = topSuppliersBmo(bmoTransactions, 10);

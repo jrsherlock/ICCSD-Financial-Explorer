@@ -9,12 +9,13 @@ import {
   Cell,
 } from 'recharts';
 import { KpiCard } from '../components/ui/KpiCard';
-import { fundSummary, apLineItems, lookups } from '../lib/data-loader';
+import { useData } from '../lib/data-loader';
 import { formatCurrency, formatCurrencyExact, formatDate, formatCompactCurrency } from '../lib/formatters';
 import { CHART_COLORS, AXIS_TICK_COLOR } from '../lib/colors';
 
 export function FundDetail() {
   const { code } = useParams<{ code: string }>();
+  const { fundSummary, apLineItems, lookups } = useData();
   const fund = fundSummary.funds.find((f) => f.code === code);
   const items = apLineItems.filter((i) => i.fund === code);
 
@@ -22,7 +23,7 @@ export function FundDetail() {
     return (
       <div>
         <Link to="/" className="text-primary text-sm hover:underline">
-          ← Back to Overview
+          &larr; Back to Overview
         </Link>
         <p className="mt-4 text-muted-foreground">Fund not found.</p>
       </div>
@@ -39,7 +40,7 @@ export function FundDetail() {
   }
   const vendorData = Array.from(vendorMap.entries())
     .map(([name, total]) => ({
-      name: name.length > 30 ? name.slice(0, 30) + '…' : name,
+      name: name.length > 30 ? name.slice(0, 30) + '\u2026' : name,
       fullName: name,
       total,
     }))
@@ -86,7 +87,7 @@ export function FundDetail() {
   return (
     <div>
       <Link to="/" className="text-primary text-sm hover:underline">
-        ← Back to Overview
+        &larr; Back to Overview
       </Link>
       <div className="flex items-center gap-3 mt-3 mb-1">
         <div className="w-1 h-5 rounded-full bg-blue-500" />

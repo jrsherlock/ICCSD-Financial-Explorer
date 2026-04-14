@@ -1,4 +1,4 @@
-import { apLineItems } from '../lib/data-loader';
+import { useData } from '../lib/data-loader';
 import { aggregateBuildings } from '../lib/aggregations';
 import { formatCurrency, formatCompactCurrency } from '../lib/formatters';
 import {
@@ -13,9 +13,10 @@ import {
 import { CHART_COLORS, AXIS_TICK_COLOR } from '../lib/colors';
 
 export function Buildings() {
-  const buildings = aggregateBuildings(apLineItems);
+  const { apLineItems, lookups } = useData();
+  const buildings = aggregateBuildings(apLineItems, lookups);
   const chartData = buildings.slice(0, 20).map((b) => ({
-    name: b.name.length > 22 ? b.name.slice(0, 22) + '…' : b.name,
+    name: b.name.length > 22 ? b.name.slice(0, 22) + '\u2026' : b.name,
     fullName: b.name,
     code: b.code,
     total: b.totalAmount,

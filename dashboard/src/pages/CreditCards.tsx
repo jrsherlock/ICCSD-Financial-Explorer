@@ -17,7 +17,7 @@ import {
 } from 'recharts';
 import { KpiCard } from '../components/ui/KpiCard';
 import { useTheme } from '../lib/theme';
-import { bmoTransactions, getCardLabel, allCards, lookups } from '../lib/data-loader';
+import { useData } from '../lib/data-loader';
 import { topSuppliersBmo } from '../lib/aggregations';
 import {
   formatCurrency,
@@ -29,12 +29,16 @@ import {
 } from '../lib/formatters';
 import { CHART_COLORS, AXIS_TICK_COLOR, GRID_STROKE_COLOR } from '../lib/colors';
 
-// Compute the full date range once
-const allDates = bmoTransactions.map((t) => t.tranDate).sort();
-const DATA_MIN = allDates[0] || '2023-07-01';
-const DATA_MAX = allDates[allDates.length - 1] || '2026-04-30';
-
 export function CreditCards() {
+  const { bmoTransactions, allCards, lookups } = useData();
+  const cardLabel = (card: string) => lookups.cards?.[card] || '';
+
+  // Compute the full date range
+  const [DATA_MIN, DATA_MAX] = useMemo(() => {
+    const dates = bmoTransactions.map((t) => t.tranDate).sort();
+    return [dates[0] || '2023-07-01', dates[dates.length - 1] || '2026-04-30'];
+  }, [bmoTransactions]);
+
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedCards, setSelectedCards] = useState<Set<string>>(() => {
     const param = searchParams.get('cards');
@@ -106,7 +110,7 @@ export function CreditCards() {
       );
     }
     return txns;
-  }, [selectedCards, dateFrom, dateTo, supplierFilter]);
+  }, [bmoTransactions, selectedCards, dateFrom, dateTo, supplierFilter]);
 
   // Separate debits (purchases) from credits (returns/payments) per month
   const monthlyData = useMemo(() => {
@@ -210,7 +214,7 @@ export function CreditCards() {
       .slice(0, 10);
 
     const matchesBuilding = lookups.buildings[inspectCard];
-    const label = getCardLabel(inspectCard);
+    const label = cardLabel(inspectCard);
 
     return {
       card: inspectCard,
@@ -223,7 +227,7 @@ export function CreditCards() {
       topSuppliers,
       uniqueSuppliers: suppliers.size,
     };
-  }, [inspectCard]);
+  }, [inspectCard, bmoTransactions, lookups]);
 
   // Large purchases only (exclude payments/credits)
   const anomalies = filteredTxns
@@ -254,7 +258,7 @@ export function CreditCards() {
       t.tranDate,
       t.postingDate,
       t.card,
-      `"${getCardLabel(t.card)}"`,
+      `"${cardLabel(t.card)}"`,
       `"${t.supplier}"`,
       `"${t.supplierNormalized || ''}"`,
       t.amount.toFixed(2),
@@ -275,7 +279,7 @@ export function CreditCards() {
     a.download = `iccsd-cc-transactions-${label}.csv`;
     a.click();
     URL.revokeObjectURL(url);
-  }, [filteredTxns, dateFrom, dateTo, selectedCards, supplierFilter]);
+  }, [filteredTxns, dateFrom, dateTo, selectedCards, supplierFilter, lookups]);
 
   // Paginated table
   const PAGE_SIZE = 100;
@@ -292,7 +296,7 @@ export function CreditCards() {
 
   // Format card display string
   const cardDisplay = (card: string) => {
-    const label = getCardLabel(card);
+    const label = cardLabel(card);
     return label ? `${card} — ${label}` : card;
   };
 
@@ -417,8 +421,8 @@ export function CreditCards() {
                   className="inline-flex items-center gap-1 bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 text-xs px-2 py-1 rounded-md hover:bg-purple-500/30 transition-colors"
                 >
                   <span className="font-mono font-medium">{card}</span>
-                  {getCardLabel(card) && (
-                    <span className="text-purple-500 dark:text-purple-400/70">{getCardLabel(card)}</span>
+                  {cardLabel(card) && (
+                    <span className="text-purple-500 dark:text-purple-400/70">{cardLabel(card)}</span>
                   )}
                   <span className="ml-0.5 opacity-60">x</span>
                 </button>
@@ -593,9 +597,9 @@ export function CreditCards() {
                           <span className="font-mono text-xs">
                             {t.card}
                           </span>
-                          {getCardLabel(t.card) && (
+                          {cardLabel(t.card) && (
                             <span className="text-muted-foreground text-[10px] ml-1.5">
-                              {getCardLabel(t.card)}
+                              {cardLabel(t.card)}
                             </span>
                           )}
                         </button>
@@ -787,7 +791,7 @@ export function CreditCards() {
             {Array.from(selectedCards).map((card, i) => {
               const isHidden = hiddenCards.has(card);
               const color = cardChartColors[i % cardChartColors.length];
-              const label = getCardLabel(card);
+              const label = cardLabel(card);
               return (
                 <button
                   key={card}
@@ -918,9 +922,9 @@ export function CreditCards() {
                               style={{ backgroundColor: entry.color }}
                             />
                             <span className="font-mono text-xs">{entry.dataKey as string}</span>
-                            {getCardLabel(entry.dataKey as string) && (
+                            {cardLabel(entry.dataKey as string) && (
                               <span className="text-muted-foreground text-[10px]">
-                                {getCardLabel(entry.dataKey as string)}
+                                {cardLabel(entry.dataKey as string)}
                               </span>
                             )}
                           </span>
@@ -987,9 +991,9 @@ export function CreditCards() {
                               style={{ backgroundColor: entry.color }}
                             />
                             <span className="font-mono text-xs">{entry.dataKey as string}</span>
-                            {getCardLabel(entry.dataKey as string) && (
+                            {cardLabel(entry.dataKey as string) && (
                               <span className="text-muted-foreground text-[10px]">
-                                {getCardLabel(entry.dataKey as string)}
+                                {cardLabel(entry.dataKey as string)}
                               </span>
                             )}
                           </span>
@@ -1105,7 +1109,7 @@ export function CreditCards() {
                   </p>
                   <p className="text-[10px] text-muted-foreground">
                     {formatDate(t.tranDate)} · Card {t.card}
-                    {getCardLabel(t.card) ? ` (${getCardLabel(t.card)})` : ''}
+                    {cardLabel(t.card) ? ` (${cardLabel(t.card)})` : ''}
                   </p>
                 </div>
                 <span className="font-mono text-sm shrink-0">

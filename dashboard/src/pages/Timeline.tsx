@@ -13,7 +13,7 @@ import {
   Cell,
 } from 'recharts';
 import { KpiCard } from '../components/ui/KpiCard';
-import { fundSummary, bmoTransactions } from '../lib/data-loader';
+import { useData } from '../lib/data-loader';
 import {
   formatCurrency,
   formatMonth,
@@ -27,6 +27,7 @@ import { useTheme } from '../lib/theme';
 
 export function Timeline() {
   const { theme } = useTheme();
+  const { fundSummary, bmoTransactions } = useData();
 
   // Monthly CC spend — debits only (exclude credits/payments which distort the chart)
   const monthlyData = useMemo(() => {
@@ -56,7 +57,7 @@ export function Timeline() {
         count: data.count,
       }))
       .sort((a, b) => a.month.localeCompare(b.month));
-  }, []);
+  }, [bmoTransactions]);
 
   // Large purchases only (exclude payments/credits)
   const largeTransactions = useMemo(
@@ -65,7 +66,7 @@ export function Timeline() {
         .filter((t) => t.amount >= 2000)
         .sort((a, b) => b.amount - a.amount)
         .slice(0, 30),
-    []
+    [bmoTransactions]
   );
 
   // Monthly transaction count for a secondary chart
@@ -89,7 +90,7 @@ export function Timeline() {
     return Array.from(map.entries())
       .map(([date, amount]) => ({ date, amount }))
       .sort((a, b) => a.date.localeCompare(b.date));
-  }, []);
+  }, [fundSummary]);
 
   // Summary stats
   const totalSpend = monthlyData.reduce((s, m) => s + m.spend, 0);

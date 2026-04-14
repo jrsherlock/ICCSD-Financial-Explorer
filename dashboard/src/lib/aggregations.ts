@@ -4,8 +4,8 @@ import type {
   VendorSummary,
   BuildingSummary,
   MonthlySpend,
+  Lookups,
 } from './types';
-import { lookups } from './data-loader';
 
 export function aggregateVendors(items: ApInvoice[]): VendorSummary[] {
   const map = new Map<string, VendorSummary>();
@@ -31,7 +31,7 @@ export function aggregateVendors(items: ApInvoice[]): VendorSummary[] {
   return Array.from(map.values()).sort((a, b) => b.totalAmount - a.totalAmount);
 }
 
-export function aggregateBuildings(items: ApInvoice[]): BuildingSummary[] {
+export function aggregateBuildings(items: ApInvoice[], lookups: Lookups): BuildingSummary[] {
   const map = new Map<string, {
     total: number;
     count: number;

@@ -1,3 +1,4 @@
+import { createContext, useContext } from 'react';
 import type {
   BmoTransaction,
   FundSummary,
@@ -6,52 +7,54 @@ import type {
   Lookups,
 } from './types';
 
-import bmoTransactionsRaw from '../data/bmo-transactions.json';
-import fundSummaryRaw from '../data/fund-summary.json';
-import apLineItemsRaw from '../data/ap-line-items.json';
-import bmoStatementsRaw from '../data/bmo-statements.json';
-import lookupsRaw from '../data/lookups.json';
+// ── Types ────────────────────────────────────────────────────────────
 
-export const bmoTransactions = bmoTransactionsRaw as BmoTransaction[];
-export const fundSummary = fundSummaryRaw as FundSummary;
-export const apLineItems = apLineItemsRaw as ApInvoice[];
-export const bmoStatements = bmoStatementsRaw as unknown as BmoStatements;
-export const lookups = lookupsRaw as Lookups;
-
-// Derived data
-export function getBuildingName(code: string): string {
-  return lookups.buildings[code] || `Building ${code}`;
+export interface CardInfo {
+  card: string;
+  label: string;
+  txnCount: number;
+  totalSpend: number;
 }
 
-export function getFunctionName(code: string): string {
-  return lookups.functions[code] || `Function ${code}`;
+export interface AppData {
+  bmoTransactions: BmoTransaction[];
+  fundSummary: FundSummary;
+  apLineItems: ApInvoice[];
+  bmoStatements: BmoStatements;
+  lookups: Lookups;
+  allCards: CardInfo[];
 }
 
-export function getObjectName(code: string): string {
-  return lookups.objects[code] || `Object ${code}`;
+// ── Async loader ─────────────────────────────────────────────────────
+
+async function fetchJson<T>(path: string): Promise<T> {
+  const res = await fetch(path);
+  if (!res.ok) throw new Error(`Failed to load ${path}: ${res.status}`);
+  return res.json();
 }
 
-export function getFundName(code: string): string {
-  return lookups.funds[code] || `Fund ${code}`;
-}
+export async function loadAllData(): Promise<AppData> {
+  const [bmoTransactions, fundSummary, apLineItems, bmoStatements, lookups] =
+    await Promise.all([
+      fetchJson<BmoTransaction[]>('/data/bmo-transactions.json'),
+      fetchJson<FundSummary>('/data/fund-summary.json'),
+      fetchJson<ApInvoice[]>('/data/ap-line-items.json'),
+      fetchJson<BmoStatements>('/data/bmo-statements.json'),
+      fetchJson<Lookups>('/data/lookups.json'),
+    ]);
 
-export function getCardLabel(card: string): string {
-  return lookups.cards?.[card] || '';
-}
-
-/** All unique card numbers from transaction data, sorted by total spend descending. */
-export const allCards: { card: string; label: string; txnCount: number; totalSpend: number }[] = (() => {
-  const map = new Map<string, { count: number; spend: number }>();
+  // Derive allCards from transactions
+  const cardMap = new Map<string, { count: number; spend: number }>();
   for (const t of bmoTransactions) {
-    const existing = map.get(t.card);
+    const existing = cardMap.get(t.card);
     if (existing) {
       existing.count++;
       if (t.amount > 0) existing.spend += t.amount;
     } else {
-      map.set(t.card, { count: 1, spend: t.amount > 0 ? t.amount : 0 });
+      cardMap.set(t.card, { count: 1, spend: t.amount > 0 ? t.amount : 0 });
     }
   }
-  return Array.from(map.entries())
+  const allCards = Array.from(cardMap.entries())
     .map(([card, data]) => ({
       card,
       label: lookups.cards?.[card] || '',
@@ -59,4 +62,38 @@ export const allCards: { card: string; label: string; txnCount: number; totalSpe
       totalSpend: data.spend,
     }))
     .sort((a, b) => b.totalSpend - a.totalSpend);
-})();
+
+  return { bmoTransactions, fundSummary, apLineItems, bmoStatements, lookups, allCards };
+}
+
+// ── React context ────────────────────────────────────────────────────
+
+export const DataContext = createContext<AppData | null>(null);
+
+export function useData(): AppData {
+  const ctx = useContext(DataContext);
+  if (!ctx) throw new Error('useData() must be used inside <DataProvider>');
+  return ctx;
+}
+
+// ── Helper functions (accept lookups explicitly) ─────────────────────
+
+export function getBuildingName(lookups: Lookups, code: string): string {
+  return lookups.buildings[code] || `Building ${code}`;
+}
+
+export function getFunctionName(lookups: Lookups, code: string): string {
+  return lookups.functions[code] || `Function ${code}`;
+}
+
+export function getObjectName(lookups: Lookups, code: string): string {
+  return lookups.objects[code] || `Object ${code}`;
+}
+
+export function getFundName(lookups: Lookups, code: string): string {
+  return lookups.funds[code] || `Fund ${code}`;
+}
+
+export function getCardLabel(lookups: Lookups, card: string): string {
+  return lookups.cards?.[card] || '';
+}

@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { apLineItems, lookups } from '../lib/data-loader';
+import { useData } from '../lib/data-loader';
 import { aggregateVendors } from '../lib/aggregations';
 import { formatCurrency, formatCurrencyExact, formatDate } from '../lib/formatters';
 
 export function Vendors() {
+  const { apLineItems, lookups } = useData();
   const vendors = aggregateVendors(apLineItems);
   const [selected, setSelected] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -34,7 +35,7 @@ export function Vendors() {
         <div className="col-span-1 bg-card border border-border rounded-lg p-4">
           <input
             type="text"
-            placeholder="Search vendors…"
+            placeholder="Search vendors..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full bg-secondary border border-border rounded-md px-3 py-2 text-sm text-foreground placeholder-muted-foreground mb-3 outline-none focus:ring-1 focus:ring-primary"

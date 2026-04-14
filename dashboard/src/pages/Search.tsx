@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { apLineItems, bmoTransactions, getCardLabel, lookups } from '../lib/data-loader';
+import { useData, getCardLabel } from '../lib/data-loader';
 import { formatCurrencyExact, formatDate, formatNumber } from '../lib/formatters';
 
 interface SearchResult {
@@ -18,6 +18,7 @@ type TypeFilter = 'all' | 'ap' | 'cc';
 const PAGE_SIZE = 100;
 
 export function Search() {
+  const { apLineItems, bmoTransactions, lookups } = useData();
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(0);
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
@@ -52,7 +53,7 @@ export function Search() {
     for (const t of bmoTransactions) {
       const supplierMatch = t.supplier.toLowerCase().includes(q);
       const normMatch = t.supplierNormalized?.toLowerCase().includes(q);
-      const cardLabel = getCardLabel(t.card).toLowerCase();
+      const cardLabel = getCardLabel(lookups, t.card).toLowerCase();
       const cardMatch = cardLabel.includes(q) || t.card.includes(q);
 
       if (supplierMatch || normMatch || cardMatch) {
@@ -70,7 +71,7 @@ export function Search() {
     // Sort by amount descending
     matches.sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount));
     return matches;
-  }, [query]);
+  }, [query, apLineItems, bmoTransactions, lookups]);
 
   const results = useMemo(() => {
     if (typeFilter === 'all') return allResults;
@@ -94,7 +95,7 @@ export function Search() {
       r.amount.toFixed(2),
       r.date,
       r.fund || '',
-      r.card ? `${r.card}${getCardLabel(r.card) ? ' - ' + getCardLabel(r.card) : ''}` : '',
+      r.card ? `${r.card}${getCardLabel(lookups, r.card) ? ' - ' + getCardLabel(lookups, r.card) : ''}` : '',
     ]);
     const csv = [headers, ...rows].map((r) => r.join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
@@ -104,7 +105,7 @@ export function Search() {
     a.download = `iccsd-search-${query}.csv`;
     a.click();
     URL.revokeObjectURL(url);
-  }, [results, query]);
+  }, [results, query, lookups]);
 
   return (
     <div>
@@ -188,7 +189,7 @@ export function Search() {
           {totalPages > 1 && (
             <div className="flex items-center justify-between px-4 py-2 bg-secondary/30 border-b border-border">
               <span className="text-xs text-muted-foreground">
-                Showing {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, results.length)} of {formatNumber(results.length)}
+                Showing {page * PAGE_SIZE + 1}&ndash;{Math.min((page + 1) * PAGE_SIZE, results.length)} of {formatNumber(results.length)}
               </span>
               <div className="flex items-center gap-2 text-xs">
                 <button
@@ -261,8 +262,8 @@ export function Search() {
                         title={`View card ${r.card} in Credit Card Analytics`}
                       >
                         <span className="font-mono group-hover:underline">{r.card}</span>
-                        {getCardLabel(r.card) && (
-                          <span className="ml-1 text-purple-500 dark:text-purple-400/60">{getCardLabel(r.card)}</span>
+                        {getCardLabel(lookups, r.card) && (
+                          <span className="ml-1 text-purple-500 dark:text-purple-400/60">{getCardLabel(lookups, r.card)}</span>
                         )}
                       </Link>
                     )}
