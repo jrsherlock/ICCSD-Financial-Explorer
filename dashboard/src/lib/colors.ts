@@ -28,6 +28,10 @@ export const CHART_COLORS = [
   '#f43f5e',
 ];
 
+// Data-source identity colors
+export const AP_COLOR = '#3b82f6';   // blue-500 — Accounts Payable
+export const CC_COLOR = '#a855f7';   // purple-500 — Credit Cards
+
 export function getFundColor(code: string): string {
   return FUND_COLORS[code] || '#64748b';
 }

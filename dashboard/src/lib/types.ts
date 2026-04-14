@@ -103,6 +103,7 @@ export interface Lookups {
   functions: Record<string, string>;
   objects: Record<string, string>;
   funds: Record<string, string>;
+  cards: Record<string, string>;
 }
 
 // === Aggregated views ===

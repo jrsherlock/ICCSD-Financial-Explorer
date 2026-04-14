@@ -49,6 +49,13 @@ export function Overview() {
   const fundData = aggregateByFund(apLineItems);
   const topBmoSuppliers = topSuppliersBmo(bmoTransactions, 10);
 
+  const ccPurchases = bmoTransactions
+    .filter((t) => t.amount > 0)
+    .reduce((s, t) => s + t.amount, 0);
+  const ccCredits = bmoTransactions
+    .filter((t) => t.amount < 0)
+    .reduce((s, t) => s + t.amount, 0);
+
   const fundChartData = fundSummary.funds
     .filter((f) => f.total > 0)
     .sort((a, b) => b.total - a.total)
@@ -63,7 +70,7 @@ export function Overview() {
     }));
 
   const topVendors = vendors.slice(0, 10).map((v, i) => ({
-    name: v.name.length > 25 ? v.name.slice(0, 25) + '…' : v.name,
+    name: v.name.length > 25 ? v.name.slice(0, 25) + '...' : v.name,
     fullName: v.name,
     total: v.totalAmount,
     color: CHART_COLORS[i % CHART_COLORS.length],
@@ -73,141 +80,183 @@ export function Overview() {
     <div>
       <h2 className="text-xl font-bold mb-1">Financial Overview</h2>
       <p className="text-sm text-muted-foreground mb-6">
-        Iowa City Community School District — Accounts Payable Summary
+        Iowa City Community School District — Accounts Payable &amp; Credit Card Summary
       </p>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-4 gap-4 mb-8">
-        <KpiCard
-          label="Total AP"
-          value={formatCurrency(fundSummary.grandTotal)}
-          subtitle={`Report date: ${fundSummary.reportDate}`}
-        />
-        <KpiCard
-          label="CC Transactions"
-          value={formatNumber(bmoTransactions.length)}
-          subtitle={`${formatCurrency(bmoTransactions.reduce((s, t) => s + t.amount, 0))} total`}
-        />
-        <KpiCard
-          label="Vendors"
-          value={formatNumber(vendors.length)}
-          subtitle="Unique AP vendors"
-        />
-        <KpiCard
-          label="Active Funds"
-          value={String(fundData.length)}
-          subtitle={`of ${fundSummary.funds.length} total funds`}
-        />
-      </div>
+      {/* ═══════════════════ ACCOUNTS PAYABLE SECTION ═══════════════════ */}
+      <div className="mb-10">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-1 h-5 rounded-full bg-blue-500" />
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-blue-400">
+            Accounts Payable
+          </h3>
+          <span className="text-xs text-muted-foreground">
+            Board-approved invoices with fund &amp; account coding
+          </span>
+        </div>
 
-      {/* Charts Row */}
-      <div className="grid grid-cols-2 gap-6 mb-8">
-        {/* Fund Bar Chart */}
-        <div className="bg-card border border-border rounded-lg p-5">
-          <h3 className="text-sm font-semibold mb-4">Spending by Fund</h3>
-          <ResponsiveContainer width="100%" height={320}>
-            <BarChart
-              data={fundChartData}
-              layout="vertical"
-              margin={{ left: 10, right: 30, top: 0, bottom: 0 }}
-            >
-              <XAxis
-                type="number"
-                tickFormatter={formatCompactCurrency}
-                tick={{ fill: '#a0a0b4', fontSize: 11 }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                type="category"
-                dataKey="shortName"
-                width={140}
-                tick={{ fill: '#a0a0b4', fontSize: 11 }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <Tooltip content={<CustomTooltip />} />
-              <Bar
-                dataKey="total"
-                radius={[0, 4, 4, 0]}
-                cursor="pointer"
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                onClick={(data: any) => navigate(`/fund/${data.code}`)}
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          <KpiCard
+            label="AP Grand Total"
+            value={formatCurrency(fundSummary.grandTotal)}
+            subtitle={`Report date: ${fundSummary.reportDate}`}
+            variant="ap"
+          />
+          <KpiCard
+            label="AP Vendors"
+            value={formatNumber(vendors.length)}
+            subtitle="Unique vendors"
+            variant="ap"
+          />
+          <KpiCard
+            label="Active Funds"
+            value={String(fundData.length)}
+            subtitle={`of ${fundSummary.funds.length} total funds`}
+            variant="ap"
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-6">
+          {/* Fund Bar Chart */}
+          <div className="bg-card border border-border rounded-lg p-5">
+            <h3 className="text-sm font-semibold mb-4">Spending by Fund</h3>
+            <ResponsiveContainer width="100%" height={320}>
+              <BarChart
+                data={fundChartData}
+                layout="vertical"
+                margin={{ left: 10, right: 30, top: 0, bottom: 0 }}
               >
-                {fundChartData.map((entry) => (
-                  <Cell
-                    key={entry.code}
-                    fill={getFundColor(entry.code)}
-                    fillOpacity={0.85}
-                  />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+                <XAxis
+                  type="number"
+                  tickFormatter={formatCompactCurrency}
+                  tick={{ fill: '#a0a0b4', fontSize: 11 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  type="category"
+                  dataKey="shortName"
+                  width={140}
+                  tick={{ fill: '#a0a0b4', fontSize: 11 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar
+                  dataKey="total"
+                  radius={[0, 4, 4, 0]}
+                  cursor="pointer"
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  onClick={(data: any) => navigate(`/fund/${data.code}`)}
+                >
+                  {fundChartData.map((entry) => (
+                    <Cell
+                      key={entry.code}
+                      fill={getFundColor(entry.code)}
+                      fillOpacity={0.85}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
 
-        {/* Top AP Vendors */}
-        <div className="bg-card border border-border rounded-lg p-5">
-          <h3 className="text-sm font-semibold mb-4">Top AP Vendors</h3>
-          <ResponsiveContainer width="100%" height={320}>
-            <BarChart
-              data={topVendors}
-              layout="vertical"
-              margin={{ left: 10, right: 30, top: 0, bottom: 0 }}
-            >
-              <XAxis
-                type="number"
-                tickFormatter={formatCompactCurrency}
-                tick={{ fill: '#a0a0b4', fontSize: 11 }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                type="category"
-                dataKey="name"
-                width={160}
-                tick={{ fill: '#a0a0b4', fontSize: 11 }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="total" radius={[0, 4, 4, 0]}>
-                {topVendors.map((entry, i) => (
-                  <Cell
-                    key={entry.name}
-                    fill={CHART_COLORS[i % CHART_COLORS.length]}
-                    fillOpacity={0.85}
-                  />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+          {/* Top AP Vendors */}
+          <div className="bg-card border border-border rounded-lg p-5">
+            <h3 className="text-sm font-semibold mb-4">Top AP Vendors</h3>
+            <ResponsiveContainer width="100%" height={320}>
+              <BarChart
+                data={topVendors}
+                layout="vertical"
+                margin={{ left: 10, right: 30, top: 0, bottom: 0 }}
+              >
+                <XAxis
+                  type="number"
+                  tickFormatter={formatCompactCurrency}
+                  tick={{ fill: '#a0a0b4', fontSize: 11 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  type="category"
+                  dataKey="name"
+                  width={160}
+                  tick={{ fill: '#a0a0b4', fontSize: 11 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar dataKey="total" radius={[0, 4, 4, 0]}>
+                  {topVendors.map((entry, i) => (
+                    <Cell
+                      key={entry.name}
+                      fill={CHART_COLORS[i % CHART_COLORS.length]}
+                      fillOpacity={0.85}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       </div>
 
-      {/* Top CC Suppliers */}
-      <div className="bg-card border border-border rounded-lg p-5">
-        <h3 className="text-sm font-semibold mb-4">
-          Top Credit Card Suppliers (Normalized)
-        </h3>
-        <div className="grid grid-cols-5 gap-3">
-          {topBmoSuppliers.map((s, i) => (
-            <div
-              key={s.name}
-              className="bg-secondary/50 rounded-md p-3 border border-border/50"
-            >
-              <p className="text-xs text-muted-foreground">#{i + 1}</p>
-              <p className="font-medium text-sm truncate" title={s.name}>
-                {s.name}
-              </p>
-              <p className="text-primary text-sm font-bold">
-                {formatCurrency(s.total)}
-              </p>
-              <p className="text-[10px] text-muted-foreground">
-                {s.count} transactions
-              </p>
-            </div>
-          ))}
+      {/* ═══════════════════ CREDIT CARDS SECTION ═══════════════════ */}
+      <div>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-1 h-5 rounded-full bg-purple-500" />
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-purple-400">
+            Credit Cards
+          </h3>
+          <span className="text-xs text-muted-foreground">
+            BMO Mastercard transactions by card &amp; supplier
+          </span>
+        </div>
+
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          <KpiCard
+            label="CC Total Purchases"
+            value={formatCurrency(ccPurchases)}
+            subtitle={`${formatNumber(bmoTransactions.filter((t) => t.amount > 0).length)} transactions`}
+            variant="cc"
+          />
+          <KpiCard
+            label="CC Credits / Returns"
+            value={formatCurrency(Math.abs(ccCredits))}
+            subtitle={`${formatNumber(bmoTransactions.filter((t) => t.amount < 0).length)} transactions`}
+            variant="cc"
+          />
+          <KpiCard
+            label="CC Net Spend"
+            value={formatCurrency(ccPurchases + ccCredits)}
+            subtitle={`${formatNumber(bmoTransactions.length)} total transactions`}
+            variant="cc"
+          />
+        </div>
+
+        <div className="bg-card border border-border rounded-lg p-5">
+          <h3 className="text-sm font-semibold mb-4">
+            Top Credit Card Suppliers (Normalized)
+          </h3>
+          <div className="grid grid-cols-5 gap-3">
+            {topBmoSuppliers.map((s, i) => (
+              <div
+                key={s.name}
+                className="bg-secondary/50 rounded-md p-3 border border-border/50"
+              >
+                <p className="text-xs text-muted-foreground">#{i + 1}</p>
+                <p className="font-medium text-sm truncate" title={s.name}>
+                  {s.name}
+                </p>
+                <p className="text-purple-400 text-sm font-bold">
+                  {formatCurrency(s.total)}
+                </p>
+                <p className="text-[10px] text-muted-foreground">
+                  {s.count} transactions
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
