@@ -1,0 +1,20 @@
+node_modules/
+dist/
+downloads/
+etl/__pycache__/
+etl/.venv/
+.env
+.DS_Store
+*.pyc
+
+# Scraping scripts (not part of the dashboard)
+download_all.js
+download_docs.mjs
+extract_and_download.js
+extract_v2.js
+extract_v3.js
+extract_v4.js
+package.json
+package-lock.json
+_page_*.html
+_page_*.png

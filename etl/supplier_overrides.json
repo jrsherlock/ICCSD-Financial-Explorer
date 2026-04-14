@@ -1,0 +1,79 @@
+{
+  "_comment": "Manual corrections for supplier name normalization. Key is pattern to match (case-insensitive), value is the normalized group.",
+
+  "AMAZON": { "normalized": "Amazon", "category": "Marketplace" },
+  "AMZN MKTP": { "normalized": "Amazon", "category": "Marketplace" },
+  "AMZN MKTPL": { "normalized": "Amazon", "category": "Marketplace" },
+  "AMAZON MKTPL": { "normalized": "Amazon", "category": "Marketplace" },
+  "AMAZON MKTPLACE": { "normalized": "Amazon", "category": "Marketplace" },
+  "AMAZON.COM": { "normalized": "Amazon", "category": "Direct" },
+
+  "SHERWIN WILLIAMS": { "normalized": "Sherwin-Williams", "category": "Paint" },
+  "SHERWIN-WILLIAMS": { "normalized": "Sherwin-Williams", "category": "Paint" },
+
+  "HY-VEE": { "normalized": "Hy-Vee", "category": "Grocery" },
+  "HY VEE": { "normalized": "Hy-Vee", "category": "Grocery" },
+
+  "MENARDS": { "normalized": "Menards", "category": "Hardware" },
+
+  "JIMMY JOHNS": { "normalized": "Jimmy John's", "category": "Restaurant" },
+  "JIMMY JOHN'S": { "normalized": "Jimmy John's", "category": "Restaurant" },
+
+  "CASEYS": { "normalized": "Casey's", "category": "Convenience" },
+  "CASEY'S": { "normalized": "Casey's", "category": "Convenience" },
+
+  "NAPA PARTS": { "normalized": "NAPA Auto Parts", "category": "Auto Parts" },
+
+  "ARNOLD MOTOR SUPPLY": { "normalized": "Arnold Motor Supply", "category": "Auto Parts" },
+
+  "VAN METER INC": { "normalized": "Van Meter Inc", "category": "Electrical Supply" },
+
+  "ODP BUS SOL": { "normalized": "Office Depot", "category": "Office Supply" },
+  "OFFICE DEPOT": { "normalized": "Office Depot", "category": "Office Supply" },
+
+  "HARBOR FREIGHT": { "normalized": "Harbor Freight", "category": "Tools" },
+
+  "WHITE CAP": { "normalized": "White Cap", "category": "Construction Supply" },
+
+  "PPG PAINTS": { "normalized": "PPG Paints", "category": "Paint" },
+
+  "THE DEPOT EXPRESS": { "normalized": "The Depot Express", "category": "Fuel" },
+
+  "PODS": { "normalized": "PODS", "category": "Storage" },
+
+  "SCHEELS": { "normalized": "Scheels", "category": "Sporting Goods" },
+
+  "MICROSOFT": { "normalized": "Microsoft", "category": "Software" },
+
+  "SONSHINE DRY CLEANERS": { "normalized": "Sonshine Dry Cleaners", "category": "Laundry" },
+
+  "PSC DISTRIBUTION": { "normalized": "PSC Distribution", "category": "Distribution" },
+
+  "GIERKE ROBINSON": { "normalized": "Gierke-Robinson", "category": "Supply" },
+
+  "PARTY CITY": { "normalized": "Party City", "category": "Party Supply" },
+
+  "BESTBUY": { "normalized": "Best Buy", "category": "Electronics" },
+  "BEST BUY": { "normalized": "Best Buy", "category": "Electronics" },
+
+  "STAPL": { "normalized": "Staples", "category": "Office Supply" },
+  "STAPLES": { "normalized": "Staples", "category": "Office Supply" },
+
+  "OFFICE EXPRESS": { "normalized": "Office Express", "category": "Office Supply" },
+
+  "REV.COM": { "normalized": "Rev.com", "category": "Transcription" },
+
+  "GAYLORD OPRY": { "normalized": "Gaylord Opryland Resort", "category": "Hotel" },
+
+  "PRACTICE SPORTS": { "normalized": "Practice Sports", "category": "Sporting Goods" },
+
+  "VERIZON": { "normalized": "Verizon", "category": "Telecom" },
+
+  "ALLIANT ENERGY": { "normalized": "Alliant Energy", "category": "Utility" },
+  "MIDAMERICAN ENERGY": { "normalized": "MidAmerican Energy", "category": "Utility" },
+  "CITY OF IOWA CITY": { "normalized": "City of Iowa City", "category": "Utility/Government" },
+
+  "GREATAMERICA": { "normalized": "GreatAmerica Financial", "category": "Leasing" },
+
+  "JOHNSON COUNTY": { "normalized": "Johnson County", "category": "Government" }
+}

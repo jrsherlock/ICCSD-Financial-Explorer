@@ -1,0 +1,169 @@
+{
+  "reportDate": "2026-04-14",
+  "grandTotal": 2149920.44,
+  "funds": [
+    {
+      "code": "10",
+      "name": "General Fund",
+      "total": 625035.58,
+      "details": [
+        {
+          "reportDate": "2026-03-24",
+          "amount": 48457.75
+        },
+        {
+          "reportDate": "2026-03-31",
+          "amount": 115293.98
+        },
+        {
+          "reportDate": "2026-04-07",
+          "amount": 461283.85
+        }
+      ]
+    },
+    {
+      "code": "61",
+      "name": "Nutrition Fund",
+      "total": 175269.82,
+      "details": [
+        {
+          "reportDate": "2026-04-07",
+          "amount": 175269.82
+        }
+      ]
+    },
+    {
+      "code": "21",
+      "name": "Student Activities Fund",
+      "total": 77210.49,
+      "details": [
+        {
+          "reportDate": "2026-03-24",
+          "amount": 17595.37
+        },
+        {
+          "reportDate": "2026-03-31",
+          "amount": 26425.83
+        },
+        {
+          "reportDate": "2026-04-07",
+          "amount": 33189.29
+        }
+      ]
+    },
+    {
+      "code": "22",
+      "name": "Management Fund",
+      "total": 201.39,
+      "details": [
+        {
+          "reportDate": "2026-04-07",
+          "amount": 201.39
+        }
+      ]
+    },
+    {
+      "code": "31",
+      "name": "Capital Projects Fund - GO Bond",
+      "total": 10961.0,
+      "details": [
+        {
+          "reportDate": "2026-04-07",
+          "amount": 10961.0
+        }
+      ]
+    },
+    {
+      "code": "33",
+      "name": "Capital Projects Fund - SAVE",
+      "total": 924044.46,
+      "details": [
+        {
+          "reportDate": "2026-03-24",
+          "amount": 14816.21
+        },
+        {
+          "reportDate": "2026-03-31",
+          "amount": 8652.02
+        },
+        {
+          "reportDate": "2026-04-07",
+          "amount": 900576.23
+        }
+      ]
+    },
+    {
+      "code": "36",
+      "name": "Physical Plant & Equipment Levy Fund",
+      "total": 253364.63,
+      "details": [
+        {
+          "reportDate": "2026-03-24",
+          "amount": 268.0
+        },
+        {
+          "reportDate": "2026-04-07",
+          "amount": 253096.63
+        }
+      ]
+    },
+    {
+      "code": "40",
+      "name": "Debt Service Fund",
+      "total": 0.0,
+      "details": []
+    },
+    {
+      "code": "71",
+      "name": "Health Insurance Fund",
+      "total": 4865.34,
+      "details": [
+        {
+          "reportDate": "2026-03-31",
+          "amount": 2365.34
+        },
+        {
+          "reportDate": "2026-04-07",
+          "amount": 2500.0
+        }
+      ]
+    },
+    {
+      "code": "74",
+      "name": "Dental Self Insurance Fund",
+      "total": 78540.27,
+      "details": [
+        {
+          "reportDate": "2026-04-07",
+          "amount": 78540.27
+        }
+      ]
+    },
+    {
+      "code": "82",
+      "name": "School Children's Aid",
+      "total": 72.22,
+      "details": [
+        {
+          "reportDate": "2026-04-07",
+          "amount": 72.22
+        }
+      ]
+    },
+    {
+      "code": "84",
+      "name": "School Based Health Clinics",
+      "total": 355.24,
+      "details": [
+        {
+          "reportDate": "2026-03-17",
+          "amount": 251.49
+        },
+        {
+          "reportDate": "2026-04-07",
+          "amount": 103.75
+        }
+      ]
+    }
+  ]
+}
