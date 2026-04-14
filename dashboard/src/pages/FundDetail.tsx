@@ -11,7 +11,7 @@ import {
 import { KpiCard } from '../components/ui/KpiCard';
 import { fundSummary, apLineItems, lookups } from '../lib/data-loader';
 import { formatCurrency, formatCurrencyExact, formatDate, formatCompactCurrency } from '../lib/formatters';
-import { CHART_COLORS } from '../lib/colors';
+import { CHART_COLORS, AXIS_TICK_COLOR } from '../lib/colors';
 
 export function FundDetail() {
   const { code } = useParams<{ code: string }>();
@@ -93,7 +93,7 @@ export function FundDetail() {
         <h2 className="text-xl font-bold">
           Fund {fund.code}: {lookups.funds[fund.code] || fund.name}
         </h2>
-        <span className="text-[10px] font-medium uppercase tracking-wider bg-blue-500/15 text-blue-400 px-2 py-0.5 rounded">AP</span>
+        <span className="text-[10px] font-medium uppercase tracking-wider bg-blue-50 dark:bg-blue-500/15 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded">AP</span>
       </div>
       <p className="text-sm text-muted-foreground mb-6 ml-4">
         Detailed breakdown of accounts payable
@@ -149,7 +149,7 @@ export function FundDetail() {
               <XAxis
                 type="number"
                 tickFormatter={formatCompactCurrency}
-                tick={{ fill: '#a0a0b4', fontSize: 11 }}
+                tick={{ fill: AXIS_TICK_COLOR, fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
               />
@@ -157,7 +157,7 @@ export function FundDetail() {
                 type="category"
                 dataKey="name"
                 width={180}
-                tick={{ fill: '#a0a0b4', fontSize: 10 }}
+                tick={{ fill: AXIS_TICK_COLOR, fontSize: 10 }}
                 axisLine={false}
                 tickLine={false}
               />
@@ -190,7 +190,7 @@ export function FundDetail() {
                 <XAxis
                   type="number"
                   tickFormatter={formatCompactCurrency}
-                  tick={{ fill: '#a0a0b4', fontSize: 11 }}
+                  tick={{ fill: AXIS_TICK_COLOR, fontSize: 11 }}
                   axisLine={false}
                   tickLine={false}
                 />
@@ -198,7 +198,7 @@ export function FundDetail() {
                   type="category"
                   dataKey="name"
                   width={160}
-                  tick={{ fill: '#a0a0b4', fontSize: 10 }}
+                  tick={{ fill: AXIS_TICK_COLOR, fontSize: 10 }}
                   axisLine={false}
                   tickLine={false}
                 />

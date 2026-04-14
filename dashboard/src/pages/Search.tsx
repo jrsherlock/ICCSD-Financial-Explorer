@@ -150,7 +150,7 @@ export function Search() {
             onClick={() => { setTypeFilter('ap'); setPage(0); }}
             className={`px-3 py-1.5 rounded-md text-sm transition-colors flex items-center gap-1.5 ${
               typeFilter === 'ap'
-                ? 'bg-blue-500/15 text-blue-400 font-medium'
+                ? 'bg-blue-50 dark:bg-blue-500/15 text-blue-600 dark:text-blue-400 font-medium'
                 : 'bg-secondary text-muted-foreground hover:text-foreground'
             }`}
           >
@@ -161,7 +161,7 @@ export function Search() {
             onClick={() => { setTypeFilter('cc'); setPage(0); }}
             className={`px-3 py-1.5 rounded-md text-sm transition-colors flex items-center gap-1.5 ${
               typeFilter === 'cc'
-                ? 'bg-purple-500/15 text-purple-400 font-medium'
+                ? 'bg-purple-50 dark:bg-purple-500/15 text-purple-600 dark:text-purple-400 font-medium'
                 : 'bg-secondary text-muted-foreground hover:text-foreground'
             }`}
           >
@@ -236,8 +236,8 @@ export function Search() {
                     <span
                       className={`text-[11px] font-medium px-2 py-0.5 rounded ${
                         r.type === 'ap'
-                          ? 'bg-blue-500/15 text-blue-400'
-                          : 'bg-purple-500/15 text-purple-400'
+                          ? 'bg-blue-50 dark:bg-blue-500/15 text-blue-600 dark:text-blue-400'
+                          : 'bg-purple-50 dark:bg-purple-500/15 text-purple-600 dark:text-purple-400'
                       }`}
                     >
                       {r.type === 'ap' ? 'AP' : 'CC'}
@@ -252,24 +252,24 @@ export function Search() {
                   </td>
                   <td className="py-2 px-4">
                     {r.fund && (
-                      <span className="text-xs text-blue-400/80">{r.fund}</span>
+                      <span className="text-xs text-blue-600 dark:text-blue-400">{r.fund}</span>
                     )}
                     {r.card && (
                       <Link
                         to={`/credit-cards?cards=${r.card}`}
-                        className="text-xs text-purple-400/80 hover:text-purple-300 transition-colors group"
+                        className="text-xs text-purple-600 dark:text-purple-400 hover:text-purple-500 dark:hover:text-purple-300 transition-colors group"
                         title={`View card ${r.card} in Credit Card Analytics`}
                       >
                         <span className="font-mono group-hover:underline">{r.card}</span>
                         {getCardLabel(r.card) && (
-                          <span className="ml-1 text-purple-400/60">{getCardLabel(r.card)}</span>
+                          <span className="ml-1 text-purple-500 dark:text-purple-400/60">{getCardLabel(r.card)}</span>
                         )}
                       </Link>
                     )}
                   </td>
                   <td
                     className={`py-2 px-4 text-right font-mono whitespace-nowrap ${
-                      r.amount < 0 ? 'text-green-400' : ''
+                      r.amount < 0 ? 'text-green-600 dark:text-green-400' : ''
                     }`}
                   >
                     {formatCurrencyExact(r.amount)}

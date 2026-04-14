@@ -10,7 +10,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from 'recharts';
-import { CHART_COLORS } from '../lib/colors';
+import { CHART_COLORS, AXIS_TICK_COLOR } from '../lib/colors';
 
 export function Buildings() {
   const buildings = aggregateBuildings(apLineItems);
@@ -45,7 +45,7 @@ export function Buildings() {
       <div className="flex items-center gap-3 mb-1">
         <div className="w-1 h-5 rounded-full bg-blue-500" />
         <h2 className="text-xl font-bold">Building/Site View</h2>
-        <span className="text-[10px] font-medium uppercase tracking-wider bg-blue-500/15 text-blue-400 px-2 py-0.5 rounded">AP</span>
+        <span className="text-[10px] font-medium uppercase tracking-wider bg-blue-50 dark:bg-blue-500/15 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded">AP</span>
       </div>
       <p className="text-sm text-muted-foreground mb-6 ml-4">
         Spending by school and facility · Derived from AP account codes
@@ -65,7 +65,7 @@ export function Buildings() {
             <XAxis
               type="number"
               tickFormatter={formatCompactCurrency}
-              tick={{ fill: '#a0a0b4', fontSize: 11 }}
+              tick={{ fill: AXIS_TICK_COLOR, fontSize: 11 }}
               axisLine={false}
               tickLine={false}
             />
@@ -73,7 +73,7 @@ export function Buildings() {
               type="category"
               dataKey="name"
               width={170}
-              tick={{ fill: '#a0a0b4', fontSize: 10 }}
+              tick={{ fill: AXIS_TICK_COLOR, fontSize: 10 }}
               axisLine={false}
               tickLine={false}
             />

@@ -16,6 +16,7 @@ import {
   CartesianGrid,
 } from 'recharts';
 import { KpiCard } from '../components/ui/KpiCard';
+import { useTheme } from '../lib/theme';
 import { bmoTransactions, getCardLabel, allCards, lookups } from '../lib/data-loader';
 import { topSuppliersBmo } from '../lib/aggregations';
 import {
@@ -26,7 +27,7 @@ import {
   formatCurrencyExact,
   formatDate,
 } from '../lib/formatters';
-import { CHART_COLORS } from '../lib/colors';
+import { CHART_COLORS, AXIS_TICK_COLOR, GRID_STROKE_COLOR } from '../lib/colors';
 
 // Compute the full date range once
 const allDates = bmoTransactions.map((t) => t.tranDate).sort();
@@ -59,6 +60,7 @@ export function CreditCards() {
   const [chartMode, setChartMode] = useState<'aggregated' | 'by-card'>('aggregated');
   const [chartType, setChartType] = useState<'line' | 'stacked'>('line');
   const [hiddenCards, setHiddenCards] = useState<Set<string>>(new Set());
+  const { theme } = useTheme();
 
   // Card picker: filter the full list by search
   const visibleCards = useMemo(() => {
@@ -310,7 +312,7 @@ export function CreditCards() {
 
       {/* ── Filters ── */}
       <div className="bg-secondary/40 border border-border border-t-2 border-t-purple-500/60 rounded-lg p-4 mb-8">
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-purple-400 mb-3">Filters</p>
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-purple-600 dark:text-purple-400 mb-3">Filters</p>
         <div className="flex items-end gap-4 flex-wrap">
           <div>
             <label className="block text-[10px] text-muted-foreground uppercase tracking-wider mb-1">
@@ -363,9 +365,9 @@ export function CreditCards() {
               onClick={() => { setShowTable(!showTable); setTablePage(0); }}
               className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                 showTable
-                  ? 'bg-purple-500/15 text-purple-400 border border-purple-500/30'
+                  ? 'bg-purple-50 dark:bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-500/30'
                   : hasFilters && !showTable
-                    ? 'bg-purple-500 text-white shadow-md shadow-purple-500/25 hover:bg-purple-600 border border-purple-500'
+                    ? 'bg-purple-500 text-white shadow-md shadow-purple-200 dark:shadow-purple-500/25 hover:bg-purple-600 border border-purple-500'
                     : 'bg-card text-muted-foreground hover:text-foreground border border-border'
               }`}
             >
@@ -388,7 +390,7 @@ export function CreditCards() {
               onClick={() => setCardPickerOpen(!cardPickerOpen)}
               className={`text-xs px-3 py-1 rounded-md transition-colors ${
                 cardPickerOpen
-                  ? 'bg-purple-500/15 text-purple-400 border border-purple-500/30'
+                  ? 'bg-purple-50 dark:bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-500/30'
                   : 'bg-card border border-border text-muted-foreground hover:text-foreground'
               }`}
             >
@@ -412,11 +414,11 @@ export function CreditCards() {
                 <button
                   key={card}
                   onClick={() => toggleCard(card)}
-                  className="inline-flex items-center gap-1 bg-purple-500/20 text-purple-300 text-xs px-2 py-1 rounded-md hover:bg-purple-500/30 transition-colors"
+                  className="inline-flex items-center gap-1 bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 text-xs px-2 py-1 rounded-md hover:bg-purple-500/30 transition-colors"
                 >
                   <span className="font-mono font-medium">{card}</span>
                   {getCardLabel(card) && (
-                    <span className="text-purple-400/70">{getCardLabel(card)}</span>
+                    <span className="text-purple-500 dark:text-purple-400/70">{getCardLabel(card)}</span>
                   )}
                   <span className="ml-0.5 opacity-60">x</span>
                 </button>
@@ -444,7 +446,7 @@ export function CreditCards() {
                       onClick={() => toggleCard(c.card)}
                       className={`w-full text-left flex items-center gap-3 px-3 py-1.5 rounded-md text-sm transition-colors ${
                         isSelected
-                          ? 'bg-purple-500/15 text-purple-300'
+                          ? 'bg-purple-50 dark:bg-purple-500/15 text-purple-700 dark:text-purple-300'
                           : 'hover:bg-secondary text-foreground'
                       }`}
                     >
@@ -585,7 +587,7 @@ export function CreditCards() {
                       <span className="inline-flex items-center gap-1">
                         <button
                           onClick={() => setInspectCard(inspectCard === t.card ? null : t.card)}
-                          className="text-left hover:text-purple-400 transition-colors"
+                          className="text-left hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
                           title="Inspect card profile"
                         >
                           <span className="font-mono text-xs">
@@ -601,7 +603,7 @@ export function CreditCards() {
                           <button
                             onClick={() => toggleCard(t.card)}
                             title="Add card to filter"
-                            className="text-[9px] text-muted-foreground hover:text-purple-400 opacity-0 group-hover/card:opacity-100 transition-all ml-1 bg-secondary/80 hover:bg-purple-500/15 rounded px-1 py-0.5"
+                            className="text-[9px] text-muted-foreground hover:text-purple-600 dark:hover:text-purple-400 opacity-0 group-hover/card:opacity-100 transition-all ml-1 bg-secondary/80 hover:bg-purple-50 dark:hover:bg-purple-500/15 rounded px-1 py-0.5"
                           >
                             +filter
                           </button>
@@ -616,7 +618,7 @@ export function CreditCards() {
                     </td>
                     <td
                       className={`py-1.5 text-right font-mono whitespace-nowrap ${
-                        t.amount < 0 ? 'text-green-400' : ''
+                        t.amount < 0 ? 'text-green-600 dark:text-green-400' : ''
                       }`}
                     >
                       {formatCurrencyExact(t.amount)}
@@ -631,7 +633,7 @@ export function CreditCards() {
 
       {/* Card Inspect Panel */}
       {cardProfile && (
-        <div className="bg-card border-2 border-purple-500/30 rounded-lg p-5 mb-6">
+        <div className="bg-card border-2 border-purple-200 dark:border-purple-500/30 rounded-lg p-5 mb-6">
           <div className="flex items-start justify-between mb-4">
             <div>
               <h3 className="text-sm font-semibold flex items-center gap-2">
@@ -649,7 +651,7 @@ export function CreditCards() {
                 <p className="text-sm text-muted-foreground mt-1">No department label on file</p>
               )}
               {cardProfile.matchesBuilding && (
-                <p className="text-xs text-purple-400 mt-0.5">
+                <p className="text-xs text-purple-600 dark:text-purple-400 mt-0.5">
                   ICCSD building/dept code: {cardProfile.matchesBuilding}
                 </p>
               )}
@@ -659,7 +661,7 @@ export function CreditCards() {
                 setSelectedCards(new Set([cardProfile.card]));
                 setInspectCard(null);
               }}
-              className="bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 text-xs px-3 py-1.5 rounded-md transition-colors"
+              className="bg-purple-500/10 hover:bg-purple-100 dark:hover:bg-purple-500/20 text-purple-600 dark:text-purple-400 text-xs px-3 py-1.5 rounded-md transition-colors"
             >
               Filter to this card
             </button>
@@ -810,7 +812,7 @@ export function CreditCards() {
                 >
                   <span
                     className="w-2.5 h-2.5 rounded-sm shrink-0"
-                    style={{ backgroundColor: isHidden ? '#555' : color }}
+                    style={{ backgroundColor: isHidden ? (theme === 'dark' ? '#555' : '#d1d5db') : color }}
                   />
                   <span className="font-mono font-medium">{card}</span>
                   {label && <span className="text-muted-foreground text-[10px]">{label}</span>}
@@ -834,22 +836,22 @@ export function CreditCards() {
             <AreaChart data={monthlyData} margin={{ top: 5, right: 20, bottom: 5, left: 10 }}>
               <defs>
                 <linearGradient id="colorSpend" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#a855f7" stopOpacity={0.3} />
+                  <stop offset="5%" stopColor="#a855f7" stopOpacity={theme === 'dark' ? 0.3 : 0.12} />
                   <stop offset="95%" stopColor="#a855f7" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#2a2a3e" />
+              <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE_COLOR} />
               <XAxis
                 dataKey="month"
                 tickFormatter={(m) => formatMonth(m)}
-                tick={{ fill: '#a0a0b4', fontSize: 10 }}
+                tick={{ fill: AXIS_TICK_COLOR, fontSize: 10 }}
                 axisLine={false}
                 tickLine={false}
                 interval={2}
               />
               <YAxis
                 tickFormatter={formatCompactCurrency}
-                tick={{ fill: '#a0a0b4', fontSize: 11 }}
+                tick={{ fill: AXIS_TICK_COLOR, fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
               />
@@ -860,9 +862,9 @@ export function CreditCards() {
                   return (
                     <div className="bg-card border border-border rounded-md px-3 py-2 text-sm shadow-lg">
                       <p className="font-medium">{label ? formatMonth(String(label)) : ''}</p>
-                      <p className="text-purple-400">{formatCurrency(d.spend)} purchases</p>
+                      <p className="text-purple-600 dark:text-purple-400">{formatCurrency(d.spend)} purchases</p>
                       {d.credits > 0 && (
-                        <p className="text-green-400">-{formatCurrency(d.credits)} credits</p>
+                        <p className="text-green-600 dark:text-green-400">-{formatCurrency(d.credits)} credits</p>
                       )}
                       <p className="text-xs text-muted-foreground mt-1">{d.count} transactions</p>
                     </div>
@@ -884,18 +886,18 @@ export function CreditCards() {
         {chartMode === 'by-card' && perCardMonthly && chartType === 'line' && (
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={perCardMonthly} margin={{ top: 5, right: 20, bottom: 5, left: 10 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#2a2a3e" />
+              <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE_COLOR} />
               <XAxis
                 dataKey="month"
                 tickFormatter={(m) => formatMonth(String(m))}
-                tick={{ fill: '#a0a0b4', fontSize: 10 }}
+                tick={{ fill: AXIS_TICK_COLOR, fontSize: 10 }}
                 axisLine={false}
                 tickLine={false}
                 interval={2}
               />
               <YAxis
                 tickFormatter={formatCompactCurrency}
-                tick={{ fill: '#a0a0b4', fontSize: 11 }}
+                tick={{ fill: AXIS_TICK_COLOR, fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
               />
@@ -949,18 +951,18 @@ export function CreditCards() {
         {chartMode === 'by-card' && perCardMonthly && chartType === 'stacked' && (
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={perCardMonthly} margin={{ top: 5, right: 20, bottom: 5, left: 10 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#2a2a3e" />
+              <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE_COLOR} />
               <XAxis
                 dataKey="month"
                 tickFormatter={(m) => formatMonth(String(m))}
-                tick={{ fill: '#a0a0b4', fontSize: 10 }}
+                tick={{ fill: AXIS_TICK_COLOR, fontSize: 10 }}
                 axisLine={false}
                 tickLine={false}
                 interval={2}
               />
               <YAxis
                 tickFormatter={formatCompactCurrency}
-                tick={{ fill: '#a0a0b4', fontSize: 11 }}
+                tick={{ fill: AXIS_TICK_COLOR, fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
               />
@@ -1035,7 +1037,7 @@ export function CreditCards() {
               <XAxis
                 type="number"
                 tickFormatter={formatCompactCurrency}
-                tick={{ fill: '#a0a0b4', fontSize: 11 }}
+                tick={{ fill: AXIS_TICK_COLOR, fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
               />
@@ -1043,7 +1045,7 @@ export function CreditCards() {
                 type="category"
                 dataKey="name"
                 width={130}
-                tick={{ fill: '#a0a0b4', fontSize: 10 }}
+                tick={{ fill: AXIS_TICK_COLOR, fontSize: 10 }}
                 axisLine={false}
                 tickLine={false}
               />
@@ -1054,7 +1056,7 @@ export function CreditCards() {
                   return (
                     <div className="bg-card border border-border rounded-md px-3 py-2 text-sm shadow-lg">
                       <p className="font-medium">{p.fullName}</p>
-                      <p className="text-purple-400">
+                      <p className="text-purple-600 dark:text-purple-400">
                         {formatCurrency(payload[0].value as number)}
                       </p>
                     </div>

@@ -13,7 +13,7 @@ const VARIANT_STYLES = {
 export function KpiCard({ label, value, subtitle, variant }: KpiCardProps) {
   const variantClass = variant ? VARIANT_STYLES[variant] : '';
   return (
-    <div className={`bg-card border border-border rounded-lg p-5 ${variantClass}`}>
+    <div className={`bg-card border border-border rounded-xl p-5 shadow-sm ${variantClass}`}>
       <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
         {label}
       </p>

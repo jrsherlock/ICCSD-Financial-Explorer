@@ -25,7 +25,7 @@ import {
   formatNumber,
   formatCompactCurrency,
 } from '../lib/formatters';
-import { getFundColor, CHART_COLORS } from '../lib/colors';
+import { getFundColor, CHART_COLORS, AXIS_TICK_COLOR } from '../lib/colors';
 
 const CustomTooltip = ({
   active,
@@ -87,7 +87,7 @@ export function Overview() {
       <div className="mb-10">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-1 h-5 rounded-full bg-blue-500" />
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-blue-400">
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
             Accounts Payable
           </h3>
           <span className="text-xs text-muted-foreground">
@@ -129,7 +129,7 @@ export function Overview() {
                 <XAxis
                   type="number"
                   tickFormatter={formatCompactCurrency}
-                  tick={{ fill: '#a0a0b4', fontSize: 11 }}
+                  tick={{ fill: AXIS_TICK_COLOR, fontSize: 11 }}
                   axisLine={false}
                   tickLine={false}
                 />
@@ -137,7 +137,7 @@ export function Overview() {
                   type="category"
                   dataKey="shortName"
                   width={140}
-                  tick={{ fill: '#a0a0b4', fontSize: 11 }}
+                  tick={{ fill: AXIS_TICK_COLOR, fontSize: 11 }}
                   axisLine={false}
                   tickLine={false}
                 />
@@ -173,7 +173,7 @@ export function Overview() {
                 <XAxis
                   type="number"
                   tickFormatter={formatCompactCurrency}
-                  tick={{ fill: '#a0a0b4', fontSize: 11 }}
+                  tick={{ fill: AXIS_TICK_COLOR, fontSize: 11 }}
                   axisLine={false}
                   tickLine={false}
                 />
@@ -181,7 +181,7 @@ export function Overview() {
                   type="category"
                   dataKey="name"
                   width={160}
-                  tick={{ fill: '#a0a0b4', fontSize: 11 }}
+                  tick={{ fill: AXIS_TICK_COLOR, fontSize: 11 }}
                   axisLine={false}
                   tickLine={false}
                 />
@@ -205,7 +205,7 @@ export function Overview() {
       <div>
         <div className="flex items-center gap-3 mb-4">
           <div className="w-1 h-5 rounded-full bg-purple-500" />
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-purple-400">
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-purple-600 dark:text-purple-400">
             Credit Cards
           </h3>
           <span className="text-xs text-muted-foreground">
@@ -248,7 +248,7 @@ export function Overview() {
                 <p className="font-medium text-sm truncate" title={s.name}>
                   {s.name}
                 </p>
-                <p className="text-purple-400 text-sm font-bold">
+                <p className="text-purple-600 dark:text-purple-400 text-sm font-bold">
                   {formatCurrency(s.total)}
                 </p>
                 <p className="text-[10px] text-muted-foreground">
