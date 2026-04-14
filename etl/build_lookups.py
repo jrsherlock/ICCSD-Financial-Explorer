@@ -170,6 +170,36 @@ FUND_CODES = {
 }
 
 
+def build_card_labels():
+    """Build card last-4 → label mapping from authoritative sources only.
+
+    Tier 1: Building codes (ICCSD official school/department codes)
+    Tier 2: BMO statement account names (from the bank's own records)
+
+    Cards without an authoritative label are left unmapped — the dashboard
+    shows them by their last-4 digits.
+    """
+    stmt_path = os.path.join(DATA_DIR, 'bmo-statements.json')
+
+    labels = {}
+
+    # 1. Cards that match building codes get that name
+    for code, name in BUILDING_CODES.items():
+        labels[code] = name
+
+    # 2. BMO statement account names (authoritative, from the bank)
+    if os.path.exists(stmt_path):
+        with open(stmt_path) as f:
+            stmts = json.load(f)
+        for s in stmts.get('statements', []):
+            card = s['card']
+            acct = s.get('accountName', '')
+            if acct and card not in labels:
+                labels[card] = acct.title()
+
+    return labels
+
+
 def enrich_from_data():
     """Read ap-line-items.json to discover any codes not in our static maps."""
     ap_path = os.path.join(DATA_DIR, 'ap-line-items.json')
@@ -213,11 +243,14 @@ def main():
     print("Building lookup tables...")
     enrich_from_data()
 
+    card_labels = build_card_labels()
+
     lookups = {
         'buildings': BUILDING_CODES,
         'functions': FUNCTION_CODES,
         'objects': OBJECT_CODES,
         'funds': FUND_CODES,
+        'cards': card_labels,
     }
 
     os.makedirs(os.path.dirname(OUTPUT), exist_ok=True)
@@ -229,6 +262,7 @@ def main():
     print(f"  Functions: {len(FUNCTION_CODES)} entries")
     print(f"  Objects: {len(OBJECT_CODES)} entries")
     print(f"  Funds: {len(FUND_CODES)} entries")
+    print(f"  Cards: {len(card_labels)} entries")
 
 
 if __name__ == '__main__':

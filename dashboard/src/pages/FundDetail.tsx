@@ -88,25 +88,31 @@ export function FundDetail() {
       <Link to="/" className="text-primary text-sm hover:underline">
         ← Back to Overview
       </Link>
-      <h2 className="text-xl font-bold mt-3 mb-1">
-        Fund {fund.code}: {lookups.funds[fund.code] || fund.name}
-      </h2>
-      <p className="text-sm text-muted-foreground mb-6">
+      <div className="flex items-center gap-3 mt-3 mb-1">
+        <div className="w-1 h-5 rounded-full bg-blue-500" />
+        <h2 className="text-xl font-bold">
+          Fund {fund.code}: {lookups.funds[fund.code] || fund.name}
+        </h2>
+        <span className="text-[10px] font-medium uppercase tracking-wider bg-blue-500/15 text-blue-400 px-2 py-0.5 rounded">AP</span>
+      </div>
+      <p className="text-sm text-muted-foreground mb-6 ml-4">
         Detailed breakdown of accounts payable
       </p>
 
       {/* KPIs */}
       <div className="grid grid-cols-3 gap-4 mb-8">
-        <KpiCard label="Fund Total" value={formatCurrency(fund.total)} />
+        <KpiCard label="Fund Total" value={formatCurrency(fund.total)} variant="ap" />
         <KpiCard
           label="Vendors"
           value={String(vendorMap.size)}
           subtitle="unique vendors"
+          variant="ap"
         />
         <KpiCard
           label="Invoices"
           value={String(items.length)}
           subtitle="total invoices"
+          variant="ap"
         />
       </div>
 

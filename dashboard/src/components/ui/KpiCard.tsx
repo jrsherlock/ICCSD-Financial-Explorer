@@ -2,11 +2,18 @@ interface KpiCardProps {
   label: string;
   value: string;
   subtitle?: string;
+  variant?: 'ap' | 'cc';
 }
 
-export function KpiCard({ label, value, subtitle }: KpiCardProps) {
+const VARIANT_STYLES = {
+  ap: 'border-l-2 border-l-blue-500',
+  cc: 'border-l-2 border-l-purple-500',
+} as const;
+
+export function KpiCard({ label, value, subtitle, variant }: KpiCardProps) {
+  const variantClass = variant ? VARIANT_STYLES[variant] : '';
   return (
-    <div className="bg-card border border-border rounded-lg p-5">
+    <div className={`bg-card border border-border rounded-lg p-5 ${variantClass}`}>
       <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
         {label}
       </p>

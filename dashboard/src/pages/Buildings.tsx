@@ -42,9 +42,13 @@ export function Buildings() {
 
   return (
     <div>
-      <h2 className="text-xl font-bold mb-1">Building/Site View</h2>
-      <p className="text-sm text-muted-foreground mb-6">
-        Spending by school and facility
+      <div className="flex items-center gap-3 mb-1">
+        <div className="w-1 h-5 rounded-full bg-blue-500" />
+        <h2 className="text-xl font-bold">Building/Site View</h2>
+        <span className="text-[10px] font-medium uppercase tracking-wider bg-blue-500/15 text-blue-400 px-2 py-0.5 rounded">AP</span>
+      </div>
+      <p className="text-sm text-muted-foreground mb-6 ml-4">
+        Spending by school and facility · Derived from AP account codes
       </p>
 
       {/* Bar Chart */}
