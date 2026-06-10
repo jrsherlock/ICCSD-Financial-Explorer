@@ -1,7 +1,9 @@
 // Loader for the full ICCSD Ledger dataset (https://iccsd-ledger.vercel.app) —
 // 84k+ AP and purchasing-card line items parsed from 280 board documents,
 // reconciled to the penny against the district's own report totals.
-// Stored columnar in /data/ledger.json; decoded once and cached.
+// Fetched live from the Ledger site (single source of truth — new board
+// packets show up here as soon as the Ledger republishes), decoded once
+// and cached for the session.
 
 export interface LedgerRow {
   src: 'a' | 'c'; // check run | purchasing card
@@ -66,9 +68,9 @@ let cache: Promise<Ledger> | null = null;
 
 export function loadLedger(): Promise<Ledger> {
   if (!cache) {
-    cache = fetch('/data/ledger.json')
+    cache = fetch(`${LEDGER_SITE}/data/transactions.json`)
       .then((res) => {
-        if (!res.ok) throw new Error(`Failed to load ledger data: ${res.status}`);
+        if (!res.ok) throw new Error(`Failed to load ledger data from ${LEDGER_SITE}: ${res.status}`);
         return res.json() as Promise<RawLedger>;
       })
       .then((raw) => {
