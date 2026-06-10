@@ -72,16 +72,23 @@ export function Insights() {
   const [ledger, setLedger] = useState<Ledger | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [yoyScope, setYoyScope] = useState<'all' | 'gen' | 'cap' | 'rest'>('all');
+  const [fy, setFy] = useState<number | 'all'>('all');
   const [drill, setDrill] = useState<Drill>(null);
 
   useEffect(() => {
     loadLedger().then(setLedger).catch((e) => setError(e.message));
   }, []);
 
+  const fiscalYears = useMemo(() => {
+    if (!ledger) return [];
+    return [...new Set(ledger.rows.map((r) => r.fy))].sort((a, b) => a - b);
+  }, [ledger]);
+
   const agg = useMemo(() => {
     if (!ledger) return null;
-    const rows = ledger.rows;
+    const rows = fy === 'all' ? ledger.rows : ledger.rows.filter((r) => r.fy === fy);
     const total = rows.reduce((s, r) => s + r.amount, 0);
+    const checkRunDates = new Set(rows.filter((r) => r.src === 'a').map((r) => r.date));
 
     const fundTotals = new Map<string, number>();
     const monthFund = new Map<string, Map<string, number>>();
@@ -114,8 +121,8 @@ export function Insights() {
       .sort((a, b) => b[1].total - a[1].total)
       .slice(0, 12)
       .map(([name, g]) => ({ name, short: toTitle(name).slice(0, 28), ...g }));
-    return { total, n: rows.length, months, topFunds, monthly, topGroups, vendorCount: groupTotals.size };
-  }, [ledger]);
+    return { total, n: rows.length, months, topFunds, monthly, topGroups, vendorCount: groupTotals.size, checkRunDates: checkRunDates.size };
+  }, [ledger, fy]);
 
   const yoy = useMemo(() => {
     if (!ledger) return [];
@@ -146,7 +153,9 @@ export function Insights() {
     if (!ledger || !agg || !drill) return null;
     let match: (r: LedgerRow) => boolean;
     if (drill.kind === 'group') {
-      match = (r) => r.group === drill.group;
+      // vendor drill respects the page-level fiscal-year filter; month drills
+      // already pin a single month so the year is implied
+      match = (r) => r.group === drill.group && (fy === 'all' || r.fy === fy);
     } else {
       const { month, fund } = drill;
       match = (r) =>
@@ -161,7 +170,7 @@ export function Insights() {
     const total = rows.reduce((s, r) => s + r.amount, 0);
     rows.sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount));
     return { rows: rows.slice(0, 100), count: rows.length, total };
-  }, [ledger, agg, drill]);
+  }, [ledger, agg, drill, fy]);
 
   if (error)
     return <p className="text-sm text-red-500">Failed to load the ledger dataset: {error}</p>;
@@ -180,13 +189,33 @@ export function Insights() {
     { key: 'rest' as const, label: 'Everything else' },
   ];
 
+  const fyRangeNote = fy === 'all' ? 'Jul 2023 – Jun 2026' : `FY${fy} · Jul ${fy - 1} – Jun ${fy}`;
+
   return (
     <div>
-      <h2 className="text-xl font-bold mb-1">Insights</h2>
-      <p className="text-sm text-muted-foreground mb-4">
-        Two years of district spending in one view. Every chart clicks through to the underlying
-        payments, and every payment links to the page of the source PDF it was parsed from.
-      </p>
+      <div className="flex items-start justify-between gap-4 mb-4 flex-wrap">
+        <div>
+          <h2 className="text-xl font-bold mb-1">Insights</h2>
+          <p className="text-sm text-muted-foreground">
+            Two years of district spending in one view. Every chart clicks through to the underlying
+            payments, and every payment links to the page of the source PDF it was parsed from.
+          </p>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <label htmlFor="insights-fy" className="text-xs text-muted-foreground">Fiscal year</label>
+          <select
+            id="insights-fy"
+            value={String(fy)}
+            onChange={(e) => { setFy(e.target.value === 'all' ? 'all' : Number(e.target.value)); setDrill(null); }}
+            className="bg-card border border-border rounded-md px-3 py-1.5 text-sm text-foreground outline-none focus:ring-1 focus:ring-primary/50"
+          >
+            <option value="all">All fiscal years</option>
+            {fiscalYears.map((y) => (
+              <option key={y} value={y}>FY{y} (Jul {y - 1}–Jun {y})</option>
+            ))}
+          </select>
+        </div>
+      </div>
       <div className="bg-card border border-border rounded-lg px-4 py-3 mb-6 text-xs text-muted-foreground">
         Dataset: 84,883 AP and purchasing-card line items parsed from 280 documents published with
         ICCSD board agendas (Jul 2023 – Jun 2026). Parsed check batches reconcile to the penny
@@ -197,9 +226,9 @@ export function Insights() {
       </div>
 
       <div className="grid grid-cols-4 gap-4 mb-8">
-        <KpiCard label="Total tracked" value={formatCurrency(agg.total)} subtitle="Jul 2023 – Jun 2026" />
+        <KpiCard label="Total tracked" value={formatCurrency(agg.total)} subtitle={fyRangeNote} />
         <KpiCard label="Line items" value={formatNumber(agg.n)} subtitle="checks + card swipes" />
-        <KpiCard label="Check-run dates" value={String(ledger.checkRuns)} subtitle="102 board-approved batches" />
+        <KpiCard label="Check-run dates" value={String(agg.checkRunDates)} subtitle={fy === 'all' ? '102 board-approved batches' : 'board-approved batches'} />
         <KpiCard label="Vendors" value={formatNumber(agg.vendorCount)} subtitle="normalized payees" />
       </div>
 
@@ -207,8 +236,7 @@ export function Insights() {
       <div className="bg-card border border-border rounded-lg p-5 mb-6">
         <h3 className="text-sm font-semibold">Monthly spending, stacked by fund</h3>
         <p className="text-xs text-muted-foreground mb-4">
-          Click any segment to see its payments. The shaded region holds purchasing-card data only —
-          check-run reports begin May 2024.
+          Click any segment to see its payments.{fy === 'all' ? ' The shaded region holds purchasing-card data only — check-run reports begin May 2024.' : ` Showing FY${fy} only.`}
         </p>
         <ResponsiveContainer width="100%" height={340}>
           <BarChart data={agg.monthly} margin={{ left: 10, right: 10, top: 4, bottom: 0 }}>
@@ -227,7 +255,7 @@ export function Insights() {
               tickLine={false}
             />
             <Tooltip content={<StackTooltip />} />
-            <ReferenceArea x1="2023-07" x2="2024-04" fill={OTHER_COLOR} fillOpacity={0.08} />
+            {fy === 'all' && <ReferenceArea x1="2023-07" x2="2024-04" fill={OTHER_COLOR} fillOpacity={0.08} />}
             {[...agg.topFunds, '__other'].map((fk) => (
               <Bar
                 key={fk}
