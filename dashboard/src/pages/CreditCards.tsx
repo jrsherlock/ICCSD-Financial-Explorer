@@ -67,6 +67,26 @@ export function CreditCards() {
   const [threshold, setThreshold] = useState(1000);
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+  // Iowa fiscal year = Jul 1 – Jun 30; a quick-select drives the date range
+  const fiscalYears = useMemo(() => {
+    const ys = new Set<number>();
+    for (const t of bmoTransactions) {
+      const [y, m] = [+t.tranDate.slice(0, 4), +t.tranDate.slice(5, 7)];
+      ys.add(m >= 7 ? y + 1 : y);
+    }
+    return [...ys].sort((a, b) => a - b);
+  }, [bmoTransactions]);
+  const activeFy = useMemo(() => {
+    for (const y of fiscalYears) {
+      if (dateFrom === `${y - 1}-07-01` && dateTo === `${y}-06-30`) return y;
+    }
+    return '';
+  }, [dateFrom, dateTo, fiscalYears]);
+  const selectFy = (val: string) => {
+    if (!val) { setDateFrom(''); setDateTo(''); }
+    else { const y = Number(val); setDateFrom(`${y - 1}-07-01`); setDateTo(`${y}-06-30`); }
+    setTablePage(0);
+  };
   const [supplierFilter, setSupplierFilter] = useState('');
   const [cardSearch, setCardSearch] = useState('');
   const [showTable, setShowTable] = useState(false);
@@ -334,6 +354,21 @@ export function CreditCards() {
       <div className="bg-secondary/40 border border-border border-t-2 border-t-purple-500/60 rounded-lg p-4 mb-8">
         <p className="text-[10px] font-semibold uppercase tracking-widest text-purple-600 dark:text-purple-400 mb-3">Filters</p>
         <div className="flex items-end gap-4 flex-wrap">
+          <div>
+            <label className="block text-[10px] text-muted-foreground uppercase tracking-wider mb-1">
+              Fiscal Year
+            </label>
+            <select
+              value={activeFy ? String(activeFy) : ''}
+              onChange={(e) => selectFy(e.target.value)}
+              className="bg-card border border-border rounded-md px-3 py-1.5 text-sm text-foreground outline-none focus:ring-1 focus:ring-purple-500/50"
+            >
+              <option value="">All years</option>
+              {fiscalYears.map((y) => (
+                <option key={y} value={y}>FY{y} (Jul {y - 1}–Jun {y})</option>
+              ))}
+            </select>
+          </div>
           <div>
             <label className="block text-[10px] text-muted-foreground uppercase tracking-wider mb-1">
               From
