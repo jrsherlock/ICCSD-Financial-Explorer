@@ -12,6 +12,7 @@ const Buildings = lazy(() => import('./pages/Buildings').then((m) => ({ default:
 const CreditCards = lazy(() => import('./pages/CreditCards').then((m) => ({ default: m.CreditCards })));
 const Timeline = lazy(() => import('./pages/Timeline').then((m) => ({ default: m.Timeline })));
 const Search = lazy(() => import('./pages/Search').then((m) => ({ default: m.Search })));
+const Insights = lazy(() => import('./pages/Insights').then((m) => ({ default: m.Insights })));
 
 function LoadingScreen() {
   return (
@@ -76,6 +77,7 @@ export default function App() {
               <Route path="/credit-cards" element={<Suspense fallback={<PageFallback />}><CreditCards /></Suspense>} />
               <Route path="/timeline" element={<Suspense fallback={<PageFallback />}><Timeline /></Suspense>} />
               <Route path="/search" element={<Suspense fallback={<PageFallback />}><Search /></Suspense>} />
+              <Route path="/insights" element={<Suspense fallback={<PageFallback />}><Insights /></Suspense>} />
             </Route>
           </Routes>
         </BrowserRouter>
