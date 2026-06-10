@@ -40,7 +40,7 @@ const CustomTooltip = ({
 
 export function Overview() {
   const navigate = useNavigate();
-  const { fundSummary, apLineItems, bmoTransactions, lookups } = useData();
+  const { fundSummary, apLineItems, bmoTransactions, lookups, cardBillPayments } = useData();
   const vendors = aggregateVendors(apLineItems);
   const fundData = aggregateByFund(apLineItems);
   const topBmoSuppliers = topSuppliersBmo(bmoTransactions, 10);
@@ -229,6 +229,12 @@ export function Overview() {
             variant="cc"
           />
         </div>
+
+        <p className="text-xs text-muted-foreground -mt-3 mb-6">
+          Excludes {cardBillPayments.count} card-bill payments the district made to BMO
+          ({formatCurrency(Math.abs(cardBillPayments.total))}) — those are transfers, not purchases
+          or merchant credits.
+        </p>
 
         <div className="bg-card border border-border rounded-lg p-5">
           <h3 className="text-sm font-semibold mb-4">
