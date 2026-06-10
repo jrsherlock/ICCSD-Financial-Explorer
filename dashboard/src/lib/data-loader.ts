@@ -23,6 +23,9 @@ export interface AppData {
   bmoStatements: BmoStatements;
   lookups: Lookups;
   allCards: CardInfo[];
+  /** Card-bill payments the district made to BMO ("Payment - Automatic Pymt"),
+   *  excluded from bmoTransactions so they don't read as merchant credits. */
+  cardBillPayments: { count: number; total: number };
 }
 
 // ── Async loader ─────────────────────────────────────────────────────
@@ -34,7 +37,7 @@ async function fetchJson<T>(path: string): Promise<T> {
 }
 
 export async function loadAllData(): Promise<AppData> {
-  const [bmoTransactions, fundSummary, apLineItems, bmoStatements, lookups] =
+  const [rawBmoTransactions, fundSummary, apLineItems, bmoStatements, lookups] =
     await Promise.all([
       fetchJson<BmoTransaction[]>('/data/bmo-transactions.json'),
       fetchJson<FundSummary>('/data/fund-summary.json'),
@@ -42,6 +45,18 @@ export async function loadAllData(): Promise<AppData> {
       fetchJson<BmoStatements>('/data/bmo-statements.json'),
       fetchJson<Lookups>('/data/lookups.json'),
     ]);
+
+  // Statements include rows for the district paying its own card bill. They are
+  // transfers, not spending — kept out of the transaction set so credits/returns
+  // and net-spend figures reflect actual merchant activity.
+  const isBillPayment = (t: BmoTransaction) =>
+    t.supplier.toLowerCase().startsWith('payment -');
+  const billRows = rawBmoTransactions.filter(isBillPayment);
+  const bmoTransactions = rawBmoTransactions.filter((t) => !isBillPayment(t));
+  const cardBillPayments = {
+    count: billRows.length,
+    total: billRows.reduce((s, t) => s + t.amount, 0),
+  };
 
   // Derive allCards from transactions
   const cardMap = new Map<string, { count: number; spend: number }>();
@@ -63,7 +78,7 @@ export async function loadAllData(): Promise<AppData> {
     }))
     .sort((a, b) => b.totalSpend - a.totalSpend);
 
-  return { bmoTransactions, fundSummary, apLineItems, bmoStatements, lookups, allCards };
+  return { bmoTransactions, fundSummary, apLineItems, bmoStatements, lookups, allCards, cardBillPayments };
 }
 
 // ── React context ────────────────────────────────────────────────────
