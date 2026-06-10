@@ -103,7 +103,7 @@ export interface Lookups {
   functions: Record<string, string>;
   objects: Record<string, string>;
   funds: Record<string, string>;
-  cards: Record<string, string>;
+  cards?: Record<string, string>;  // removed — last4-as-location labels were unsupported by the coded data
 }
 
 // === Aggregated views ===

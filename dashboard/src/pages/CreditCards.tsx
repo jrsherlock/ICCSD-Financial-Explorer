@@ -28,10 +28,21 @@ import {
   formatDate,
 } from '../lib/formatters';
 import { CHART_COLORS, AXIS_TICK_COLOR, GRID_STROKE_COLOR } from '../lib/colors';
+import { loadCardEvidence, evidenceLabel, type CardEvidence } from '../lib/ledger';
+import { getBuildingName } from '../lib/data-loader';
 
 export function CreditCards() {
   const { bmoTransactions, allCards, lookups } = useData();
-  const cardLabel = (card: string) => lookups.cards?.[card] || '';
+
+  // Evidence-based card assignments from the district's coded P-Card reports
+  // (via the ICCSD Ledger). A card is labeled only when its coded purchases
+  // consistently point at one building — never guessed from the card number.
+  const [cardEv, setCardEv] = useState<CardEvidence>({});
+  useEffect(() => {
+    loadCardEvidence().then(setCardEv).catch(() => {});
+  }, []);
+  const cardLabel = (card: string) =>
+    evidenceLabel(cardEv[card], (loc) => getBuildingName(lookups, loc));
 
   // Compute the full date range
   const [DATA_MIN, DATA_MAX] = useMemo(() => {
@@ -66,16 +77,21 @@ export function CreditCards() {
   const [hiddenCards, setHiddenCards] = useState<Set<string>>(new Set());
   const { theme } = useTheme();
 
-  // Card picker: filter the full list by search
+  // Card picker: full list with evidence labels, filtered by search
+  const cardsWithLabels = useMemo(
+    () => allCards.map((c) => ({ ...c, label: cardLabel(c.card) })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [allCards, cardEv]
+  );
   const visibleCards = useMemo(() => {
-    if (!cardSearch) return allCards;
+    if (!cardSearch) return cardsWithLabels;
     const q = cardSearch.toLowerCase();
-    return allCards.filter(
+    return cardsWithLabels.filter(
       (c) =>
         c.card.includes(q) ||
         c.label.toLowerCase().includes(q)
     );
-  }, [cardSearch]);
+  }, [cardSearch, cardsWithLabels]);
 
   const toggleCard = (card: string) => {
     setSelectedCards((prev) => {
@@ -213,13 +229,13 @@ export function CreditCards() {
       .sort((a, b) => b.total - a.total)
       .slice(0, 10);
 
-    const matchesBuilding = lookups.buildings[inspectCard];
+    const ev = cardEv[inspectCard];
     const label = cardLabel(inspectCard);
 
     return {
       card: inspectCard,
       label,
-      matchesBuilding,
+      ev,
       totalTxns: txns.length,
       purchases,
       credits: Math.abs(credits),
@@ -227,7 +243,7 @@ export function CreditCards() {
       topSuppliers,
       uniqueSuppliers: suppliers.size,
     };
-  }, [inspectCard, bmoTransactions, lookups]);
+  }, [inspectCard, bmoTransactions, lookups, cardEv]);
 
   // Large purchases only (exclude payments/credits)
   const anomalies = filteredTxns
@@ -650,13 +666,21 @@ export function CreditCards() {
                 </button>
               </h3>
               {cardProfile.label ? (
-                <p className="text-lg font-bold mt-1">{cardProfile.label}</p>
+                <>
+                  <p className="text-lg font-bold mt-1">{cardProfile.label}</p>
+                  <p className="text-xs text-purple-600 dark:text-purple-400 mt-0.5">
+                    Evidence: {cardProfile.ev![1]} of {cardProfile.ev![2]} purchases in the
+                    district's coded P-Card reports (spring 2026) are coded to this building.
+                  </p>
+                </>
+              ) : cardProfile.ev ? (
+                <p className="text-sm text-muted-foreground mt-1">
+                  {cardProfile.ev[2]} coded purchase{cardProfile.ev[2] === 1 ? '' : 's'} — too few
+                  or too inconsistent to support a building assignment.
+                </p>
               ) : (
-                <p className="text-sm text-muted-foreground mt-1">No department label on file</p>
-              )}
-              {cardProfile.matchesBuilding && (
-                <p className="text-xs text-purple-600 dark:text-purple-400 mt-0.5">
-                  ICCSD building/dept code: {cardProfile.matchesBuilding}
+                <p className="text-sm text-muted-foreground mt-1">
+                  No purchases in the district's coded P-Card reports — assignment unknown.
                 </p>
               )}
             </div>

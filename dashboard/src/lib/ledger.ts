@@ -101,6 +101,29 @@ export function loadLedger(): Promise<Ledger> {
   return cache;
 }
 
+// Per-card location evidence from the district's own coded P-Card reports:
+// last4 -> [modal coded location, rows at modal, total coded rows].
+// A card earns a label only when >=5 coded purchases agree >=80%.
+export type CardEvidence = Record<string, [string, number, number]>;
+
+let evCache: Promise<CardEvidence> | null = null;
+
+export function loadCardEvidence(): Promise<CardEvidence> {
+  if (!evCache) {
+    evCache = fetch(`${LEDGER_SITE}/data/cards.json`).then((res) => {
+      if (!res.ok) throw new Error(`Failed to load card evidence: ${res.status}`);
+      return res.json() as Promise<CardEvidence>;
+    });
+  }
+  return evCache;
+}
+
+export function evidenceLabel(ev: CardEvidence[string] | undefined, buildingName: (code: string) => string): string {
+  if (!ev) return '';
+  const [loc, n, of] = ev;
+  return of >= 5 && n / of >= 0.8 ? buildingName(loc) : '';
+}
+
 export function toTitle(name: string): string {
   return name
     .toLowerCase()
